@@ -14,8 +14,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 const register = require("./routes/register");
+const auth = require("./routes/auth");
 
 app.use("/evaluation-service", register);
+app.use("/evaluation-service", auth);
 
 AppDataSource.initialize()
   .then(() => {
