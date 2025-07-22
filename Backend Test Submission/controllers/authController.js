@@ -2,7 +2,7 @@ const AppDataSource = require("../data-source");
 const Users = require("../entity");
 const jwt = require("jsonwebtoken");
 
-const loginUser = async (req, res) => {
+const auth = async (req, res) => {
   try {
     const { email, accessCode } = req.body;
 
@@ -44,4 +44,4 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser };
+module.exports = { auth };
