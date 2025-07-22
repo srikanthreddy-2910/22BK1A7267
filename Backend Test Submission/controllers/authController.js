@@ -4,25 +4,58 @@ const jwt = require("jsonwebtoken");
 
 const auth = async (req, res) => {
   try {
-    const { email, accessCode } = req.body;
+    const {
+      email,
+      name,
+      githubUsername,
+      rollNo,
+      accessCode,
+      clientID,
+      clientSecret,
+    } = req.body;
 
-    if (!email || !accessCode) {
-      return res.status(400).json({ error: "Missing email or accessCode" });
+    if (
+      !email ||
+      !name ||
+      !githubUsername ||
+      !rollNo ||
+      !accessCode ||
+      !clientID ||
+      !clientSecret
+    ) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "Missing required authentication fields",
+      });
     }
 
     const userRepository = AppDataSource.getRepository(Users);
 
     const user = await userRepository.findOne({
-      where: { email, accessCode },
+      where: {
+        email,
+        name,
+        githubUsername,
+        rollNo,
+        accessCode,
+        clientID,
+        clientSecret,
+      },
     });
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({
+        status: 401,
+        success: false,
+        message: "Invalid authentication credentials",
+      });
     }
 
     const payload = {
       email: user.email,
       name: user.name,
+      githubUsername: user.githubUsername,
       rollNo: user.rollNo,
       accessCode: user.accessCode,
       clientID: user.clientID,
@@ -33,14 +66,23 @@ const auth = async (req, res) => {
       expiresIn: "1h",
     });
 
-    return res.json({
+    return res.status(200).json({
+      status: 200,
+      success: true,
+      message: "Authentication successful",
       token_type: "Bearer",
       access_token: token,
-      expires_in: 3600,
+      expires_in: 1800,
     });
   } catch (error) {
-    console.error("Error in loginUser:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Error in auth:", error);
+
+    return res.status(500).json({
+      status: 500,
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 
